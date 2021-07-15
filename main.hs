@@ -4,6 +4,7 @@ module Main (main) where
 import System.IO -- args do usuário (caso precisar)
 import Data.List.Split -- split de strings
 import Parse -- fazer parse do arquivo de input e montar Kojun
+import Solver -- Solucionador
 
 main = do
     let file = "input.txt"
@@ -20,3 +21,4 @@ main = do
 
     print(kojum)
     print(grupos)
+    print(solve kojum grupos)
