@@ -1,6 +1,6 @@
-module Solver (solve) where
+module Solver (solve, getGroupTuples) where
 
-import Data.List               
+import Data.List
 
 countElemMatrix :: [[Int]] -> Int -> Int    -- Conta ocorrências de um elemento em uma matriz
 countElemMatrix [] _ = 0
@@ -13,6 +13,27 @@ countGroups groups group | nextGroupOcurrences == 0 = [countElemMatrix groups gr
 
 getGroupSizes :: [[Int]] -> [Int]   -- Retorna uma lista com o tamanho de cada grupo
 getGroupSizes groups = countGroups groups 0
+
+-- pegar elemento da matriz, do i,j da matriz de grupos correspondentes
+getMatrixNumberGroup :: [[[Int]]] -> [[(Int, Int)]] -> (Int, Int) -> [Int]
+getMatrixNumberGroup matrix groupTuple (i, j) = (matrix!!((groupTuple!!i)!!j)!!0))!!((groupTuple!!i)!!j)!!1)
+
+-- Separar grupos em array de tuplas (i, j) para localizar mais facilmente
+getTuples1 :: [[Int]] -> Int -> (Int, Int) -> (Int, Int) -- varredura dos grupos, linhas e colunas
+getTuples1 groups groupNow (i, j) | j == length groups = (-1, -1)
+                                  | (groups!!i)!!j == groupNow = (i, j)
+                                  | otherwise = getTuples1 groups groupNow (i, j+1)
+
+getTuples :: [[Int]] -> Int -> Int -> [(Int, Int)] -- varredura dos grupos e linhas
+getTuples groups groupNow i | i < ((length groups) - 1) = (getTuples1 groups groupNow (i, 0)) : getTuples groups groupNow (i+1)
+                              | otherwise = [getTuples1 groups groupNow (i, 0)]
+
+getGroupTuples1 :: [[Int]] -> Int -> [[(Int, Int)]] -- varredura dos grupos
+getGroupTuples1 groups groupNow | groupNow < (length groups) = getTuples groups groupNow 0 : getGroupTuples1 groups (groupNow + 1)
+                                | otherwise = [getTuples groups groupNow 0]
+
+getGroupTuples :: [[Int]] -> [[(Int, Int)]]  -- retorna uma lista de tuplas com (i, j) de cada grupo 
+getGroupTuples groups = getGroupTuples1 groups 0
 
 -- FUNÇÕES DE FILTRO =========================================================
 
@@ -50,6 +71,21 @@ filterKojun matrix | newMatrix == matrix = newMatrix
                    | otherwise = filterKojun newMatrix
                    where newMatrix = filterKojunLines matrix 0
 
+-- FUNÇÕES DE FILTRO POR GRUPO
+-- refineGroup :: [[[Int]]] -> [[(Int, Int)]] -> (Int, Int) -> [[Int]]
+-- refineGroup matrix groupTuple (i, j) | 
+
+-- filterEachGroup :: [[[Int]]] -> [[(Int, Int)]] -> (Int, Int) -> [[Int]]
+-- filterEachGroup matrix groupTuple (i, j) | length (getMatrixNumberGroup matrix groupTuple (i, j)) != 1 = refineGroup
+
+-- filterGroup :: [[[Int]]] -> [[(Int, Int)]] -> Int -> [[[Int]]]
+-- filterGroup matriz groupTuple i | i < (length groupTuple) = filterEachGroup (i, 0) : (filterGroup matrix groupTuple (i+1))
+--                                 | otherwise = [filterEachGroup matrix groupTuple (i, 0)]
+
+-- filterGroups :: [[[Int]]] -> [[(Int, Int)]] -> [[[Int]]]
+-- filterGroups matrix groupTuple = filterGroup matrix groupTuple 0
+
+
 -- FUNÇÕES DE SOBREPOSIÇÃO ===================================================
 
 overlapLine :: [Int] -> [[Int]] -> [Int] -> (Int, Int) -> [[Int]] -- Sobrepõe as possibilidades em cada posição da linha
@@ -85,8 +121,24 @@ colapseMatrix :: [[[Int]]] -> Int -> [[Int]]    -- Colapsa a matriz em uma possi
 colapseMatrix (h:t) i | length t == 0 = [colapseLine h i]
                       | otherwise = colapseLine h i : colapseMatrix t (getNextColapseIndex h i)
 
+-- FUNÇÕES DE TESTE SE JOGO ESTÁ CORRETO
+
+-- checkEachGroup :: [[[Int]]] -> [[(Int, Int)]] -> (Int, Int) -> Bool
+-- checkEachGroup [] _ _ = False
+-- checkEachGroup matrix groupTuple (i, j) | (length (getMatrixNumberGroup matrix groupTuple (i, j)) == 1 = True
+--                                         | otherwise = False
+
+-- checkGroup :: [[[Int]]] -> [[(Int, Int)]] -> Int -> Bool
+-- checkGroup [] _ _ = False
+-- checkGroup matrix groupTuple i | i < ((length groupTuple) - 1) = (checkEachGroup matrix groupTuple (i, 0)) && (checkGroup matrix groupTuple (i+1))
+--                                | otherwise = checkEachGroup matrix groupTuple (i, 0)
+
+-- testLength :: [[[Int]]] -> [[(Int, Int)]] -> Bool
+-- testLength [] _ = False
+-- testLength matrix groupTuple = checkGroup matrix groupTuple 0
+
 -- FUNÇÃO PRINCIPAL =========================================================
 
-solve :: [[Int]] -> [[Int]] -> [[[Int]]]  -- Soluciona Kojum
+solve :: [[Int]] -> [[Int]] -> [[[Int]]]  -- Soluciona Kojun
 --solve matrix groups = colapseMatrix (filterKojun (overlapMatrix matrix groups (getGroupSizes groups) 0)) 9999999999999999999999999999999 -- Número da possibilidade
 solve matrix groups = filterKojun (overlapMatrix matrix groups (getGroupSizes groups) 0)
