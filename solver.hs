@@ -15,10 +15,24 @@ getGroupSizes :: [[Int]] -> [Int]   -- Retorna uma lista com o tamanho de cada g
 getGroupSizes groups = countGroups groups 0
 
 -- pegar elemento da matriz, do i,j da matriz de grupos correspondentes
+getX :: (Int, Int) -> Int
+getX (x, _) = x
+
+getY :: (Int, Int) -> Int
+getY (_, y) = y
+
 getMatrixNumberGroup :: [[[Int]]] -> [[(Int, Int)]] -> (Int, Int) -> [Int]
-getMatrixNumberGroup matrix groupTuple (i, j) = (matrix!!((groupTuple!!i)!!j)!!0))!!((groupTuple!!i)!!j)!!1)
+getMatrixNumberGroup matrix groupTuple (i, j) = (matrix !! (getX (groupTuple!!i!!j))) !! (getY (groupTuple!!i!!j))
 
 -- Separar grupos em array de tuplas (i, j) para localizar mais facilmente
+isWrong :: (Int, Int) -> Bool
+isWrong (i, j) | i == -1 && j == -1 = False
+               | otherwise = True
+
+takeWrongs :: [[(Int, Int)]] -> [[(Int, Int)]]
+takeWrongs [] = []
+takeWrongs (head:tale) = filter isWrong head : takeWrongs tale
+
 getTuples1 :: [[Int]] -> Int -> (Int, Int) -> (Int, Int) -- varredura dos grupos, linhas e colunas
 getTuples1 groups groupNow (i, j) | j == length groups = (-1, -1)
                                   | (groups!!i)!!j == groupNow = (i, j)
@@ -33,7 +47,7 @@ getGroupTuples1 groups groupNow | groupNow < (length groups) = getTuples groups 
                                 | otherwise = [getTuples groups groupNow 0]
 
 getGroupTuples :: [[Int]] -> [[(Int, Int)]]  -- retorna uma lista de tuplas com (i, j) de cada grupo 
-getGroupTuples groups = getGroupTuples1 groups 0
+getGroupTuples groups = takeWrongs (getGroupTuples1 groups 0)
 
 -- FUNÇÕES DE FILTRO =========================================================
 
@@ -72,18 +86,22 @@ filterKojun matrix | newMatrix == matrix = newMatrix
                    where newMatrix = filterKojunLines matrix 0
 
 -- FUNÇÕES DE FILTRO POR GRUPO
--- refineGroup :: [[[Int]]] -> [[(Int, Int)]] -> (Int, Int) -> [[Int]]
--- refineGroup matrix groupTuple (i, j) | 
+refineGroup1 :: [[[Int]]] -> (Int, Int) -> Int -> [[[Int]]]  -- se for o próprio elemento, não faz nada, caso contrário, subtrai uma lista com o elemento
+refineGroup1 matrix (i, j) number | ((length (matrix!!i!!j)) == 1) && ((matrix!!i!!j) == number) = NAO_PRECISA_FAZER_NADA
+                                  | otherwise = matrix!!i!!j \\ [number]
 
--- filterEachGroup :: [[[Int]]] -> [[(Int, Int)]] -> (Int, Int) -> [[Int]]
--- filterEachGroup matrix groupTuple (i, j) | length (getMatrixNumberGroup matrix groupTuple (i, j)) != 1 = refineGroup
+refineGroup :: [[[Int]]] -> [(Int, Int)] -> Int -> [[[Int]]]  -- manda refinar todo o grupo
+refineGroup matrix (head:tale) number = refineGroup1 matrix head number : refineGroup matrix (head:tale) number
 
--- filterGroup :: [[[Int]]] -> [[(Int, Int)]] -> Int -> [[[Int]]]
--- filterGroup matriz groupTuple i | i < (length groupTuple) = filterEachGroup (i, 0) : (filterGroup matrix groupTuple (i+1))
---                                 | otherwise = [filterEachGroup matrix groupTuple (i, 0)]
+eachGroup :: [[[Int]]] -> -> [(Int, Int)] -> (Int, Int) -> [[[Int]]]  -- se tiver length 1, manda refinar o grupo
+eachGroup matrix groupTuple (i, j) | length matrix!!i!!j == 1 = refineGroup matrix groupTuple matrix!!i!!j
+                                   | otherwise = NÃO_PRECISA_FAZER_NADA
 
--- filterGroups :: [[[Int]]] -> [[(Int, Int)]] -> [[[Int]]]
--- filterGroups matrix groupTuple = filterGroup matrix groupTuple 0
+filterGroup :: [[[Int]]] -> [(Int, Int)] -> [[[Int]]]  -- ve cada elemento do grupo, para ver se tem length 1
+filterGroup matrix (head:tale) = eachGroup matrix (head:tale) head : filterGroup tale
+
+filterGroups :: [[[Int]]] -> [[(Int, Int)]] -> [[[Int]]]  -- para cada grupo, filtra/reduce os elementos deles
+filterGroups matrix (head:tale) = filterGroup matrix head : filterGroups matrix tale
 
 
 -- FUNÇÕES DE SOBREPOSIÇÃO ===================================================
