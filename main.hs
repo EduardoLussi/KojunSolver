@@ -10,7 +10,7 @@ import Solver.Solver -- Solucionador
 
 
 main = do
-    let file = "inputs/input.txt"
+    let file = "inputs/hard.txt"
     str <- readFile file
     let stringList = splitOn "\n" str
 
