@@ -8,7 +8,7 @@ import Solver -- Solucionador
 
 
 main = do
-    let file = "input1.txt"
+    let file = "input.txt"
     str <- readFile file
     let stringList = splitOn "\n" str
 
@@ -22,8 +22,10 @@ main = do
 
     let tuplasGrupos = getGroupTuples grupos 
     let jogoResolvido = solve kojun grupos
+    
+    --print (checkSolution [[4, 2, 1, 3, 1, 2, 1, 3], [3, 1, 3, 2, 3, 1, 3, 2], [2, 4, 1, 6, 2, 3, 1, 5], [1, 2, 3, 4, 1, 2, 5, 4], [2, 5, 1, 3, 2, 1, 4, 3], [1, 2, 3, 2, 1, 5, 1, 2], [3, 1, 4, 5, 2, 4, 3, 1], [1, 4, 5, 3, 1, 2, 1, 2]] grupos)
 
-    print (tuplasGrupos)
+    print (jogoResolvido)
 
     -- print(kojun)
     -- print(grupos)
