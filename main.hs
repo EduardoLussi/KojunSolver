@@ -9,7 +9,7 @@ import Solver.Solver -- Solucionador
 
 
 main = do
-    let file = "inputs/hard.txt"    -- NOME DO ARQUIVO
+    let file = "inputs/input.txt"    -- NOME DO ARQUIVO
     str <- readFile file
     let stringList = splitOn "\n" str
 
