@@ -22,4 +22,4 @@ main = do
     let kojun = firstNelements listNumber sizeNumber
     let grupos = lastNelements listNumber sizeNumber
 
-    print (solve kojun grupos)
+    putStrLn (printMatrix (solve kojun grupos))

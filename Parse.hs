@@ -5,6 +5,7 @@ module Parse (parseFile, firstNelements, lastNelements) where
 import Data.List.Split -- split de strings
 import Data.List
 
+-- pegar informações do arquivo txt
 parseFile :: [String] -> Int -> [[Int]]
 parseFile [] _ = []
 parseFile lista size = convertToMatrix lista size (size * 2)
@@ -24,3 +25,12 @@ firstNelements (head:tale) n | n > 0 = head : (firstNelements tale (n - 1))
 lastNelements :: [[Int]] -> Int -> [[Int]]
 lastNelements [] _ = []
 lastNelements lista n = reverse ((firstNelements (reverse lista) n))
+
+-- imprimir de uma forma agradável para o usuário a solução da matriz
+takeEachRow :: [Int] -> String
+takeEachRow [] = ""
+takeEachRow (head:tale) = (show head) ++ " " ++ takeEachRow tale
+
+printMatrix :: [[Int]] -> String
+printMatrix [] = ""
+printMatrix (head:tale) = takeEachRow head ++ "\n" ++ printMatrix tale
