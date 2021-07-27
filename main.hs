@@ -2,7 +2,6 @@
 
 module Main (main) where
 
--- import Parse -- parse do arquivo de input
 import System.IO -- args do usuário (caso precisar)
 import Data.List.Split -- split de strings
 import Parse -- fazer parse do arquivo de input e montar Kojun
@@ -10,7 +9,7 @@ import Solver.Solver -- Solucionador
 
 
 main = do
-    let file = "inputs/hard.txt"
+    let file = "inputs/hard.txt"    -- NOME DO ARQUIVO
     str <- readFile file
     let stringList = splitOn "\n" str
 

@@ -1,6 +1,6 @@
 -- Módulo que monta as estruturas de dados
 
-module Parse (parseFile, firstNelements, lastNelements) where
+module Parse (parseFile, firstNelements, lastNelements, printMatrix) where
 
 import Data.List.Split -- split de strings
 import Data.List
